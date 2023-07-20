@@ -1,0 +1,50 @@
+AI player ko lagi draft backup
+
+    def ai_move(self):
+        best_score = float('-inf')
+        best_move = None
+
+        for i in range(3):
+            for j in range(3):
+                if self.board[i][j] == '':
+                    self.board[i][j] = 'O'
+                    score = self.minimax(False)
+                    self.board[i][j] = ''
+
+                    if score > best_score:
+                        best_score = score
+                        best_move = (i, j)
+
+        if best_move:
+            row, col = best_move
+            self.on_click(row, col)
+
+    def minimax(self, is_maximizing):
+        if self.check_winner(0, 0):  # Check if the game has ended
+            if is_maximizing:
+                return -1
+            else:
+                return 1
+        elif self.check_draw():
+            return 0
+
+        if is_maximizing:
+            best_score = float('-inf')
+            for i in range(3):
+                for j in range(3):
+                    if self.board[i][j] == '':
+                        self.board[i][j] = 'O'
+                        score = self.minimax(False)
+                        self.board[i][j] = ''
+                        best_score = max(score, best_score)
+            return best_score
+        else:
+            best_score = float('inf')
+            for i in range(3):
+                for j in range(3):
+                    if self.board[i][j] == '':
+                        self.board[i][j] = 'X'
+                        score = self.minimax(True)
+                        self.board[i][j] = ''
+                        best_score = min(score, best_score)
+            return best_score
