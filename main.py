@@ -11,7 +11,6 @@ class TicTacToe(QMainWindow):
         self.setGeometry(100, 100, 500, 500)
         self.setWindowIcon(QIcon("Resources\logo.png"))
         self.setToolTip("Tic Tac Toe")
-        self.setStyleSheet("background-color: black;")
 
         self.current_player = 'X'
         self.board = [[''] * 3 for _ in range(3)]
@@ -30,10 +29,10 @@ class TicTacToe(QMainWindow):
         for i in range(3):
             for j in range(3):
                 self.buttons[i][j].setFont(QFont('Arial', 30))
-                self.buttons[i][j].setFixedSize(100, 100)
-                self.buttons[i][j].setStyleSheet("QPushButton { background-color: black; color: yellow; }")
+                self.buttons[i][j].setFixedSize(150, 150)  
+                self.buttons[i][j].setStyleSheet("QPushButton { background-color: black; color: red; }")
                 grid_layout.addWidget(self.buttons[i][j], i, j)
-                self.buttons[i][j].clicked.connect(lambda _, x=i, y=j: self.on_click(x, y))
+                self.buttons[i][j].clicked.connect(lambda _, row=i, col=j: self.on_click(row, col))
 
     def paintEvent(self, event):
         super().paintEvent(event)
@@ -41,25 +40,25 @@ class TicTacToe(QMainWindow):
         pen = QPen(QColor(255, 255, 255, 150), 8, Qt.SolidLine)
         painter.setPen(pen)
 
-        # Draw hash overlay
+       
         for i in range(1, 3):
-            painter.drawLine(0, i * 100, 300, i * 100)
-            painter.drawLine(i * 100, 0, i * 100, 300)
+            painter.drawLine(0, i * 150, 450, i * 150)
+            painter.drawLine(i * 150, 0, i * 150, 450)
 
-        # Draw winning line
+        
         if self.winning_line:
             x1, y1 = self.winning_line[0]
             x2, y2 = self.winning_line[2]
             painter.setPen(QPen(Qt.white, 5))
-            painter.drawLine((y1 + 0.5) * 100, (x1 + 0.5) * 100, (y2 + 0.5) * 100, (x2 + 0.5) * 100)
+            painter.drawLine(int((y1 + 0.5) * 150), int((x1 + 0.5) * 150), int((y2 + 0.5) * 150), int((x2 + 0.5) * 150))
 
-    def on_click(self, x, y):
-        if self.board[x][y] == '':
-            self.board[x][y] = self.current_player
-            self.buttons[x][y].setText(self.current_player)
-            self.buttons[x][y].setDisabled(True)  # Disable button after click
+    def on_click(self, row, col):
+        if self.board[row][col] == '':
+            self.board[row][col] = self.current_player
+            self.buttons[row][col].setText(self.current_player)
+            self.buttons[row][col].setDisabled(True)  
 
-            if self.check_winner(x, y):
+            if self.check_winner(row, col):
                 self.show_winner_message()
                 self.reset_game()
                 return
@@ -76,20 +75,20 @@ class TicTacToe(QMainWindow):
     def ai_move(self):
         empty_cells = [(i, j) for i in range(3) for j in range(3) if self.board[i][j] == '']
         if empty_cells:
-            x, y = random.choice(empty_cells)
-            self.on_click(x, y)
+            row, col = random.choice(empty_cells)
+            self.on_click(row, col)
 
-    def check_winner(self, x, y):
-        # Check rows, columns, and diagonals for a win
+    def check_winner(self, row, col):
+        # check rows ra cloumn for wins
         winning_combinations = [
-            [(i, j) for j in range(3)],  # Rows
-            [(i, j) for i in range(3)],  # Columns
-            [(i, i) for i in range(3)],  # Diagonal
-            [(i, 2 - i) for i in range(3)]  # Anti-diagonal
+            [(row, j) for j in range(3)],  #rows
+            [(i, col) for i in range(3)],  #columns
+            [(i, i) for i in range(3)],  # diagonal
+            [(i, 2 - i) for i in range(3)]  #antidiagonal
         ]
 
         for combo in winning_combinations:
-            if (x, y) in combo:
+            if (row, col) in combo:
                 if all(self.board[i][j] == self.current_player for i, j in combo):
                     self.winning_line = combo
                     return True
